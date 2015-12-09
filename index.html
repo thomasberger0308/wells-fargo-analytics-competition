@@ -51,7 +51,8 @@
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">FullText</span> <span class="pl-k">=</span> as.character(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>)
 
 <span class="pl-c"># Remove non-ascii characters</span>
-<span class="pl-v">df.texts.clean</span> <span class="pl-k">=</span> as.data.frame(iconv(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>, <span class="pl-s"><span class="pl-pds">"</span>latin1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ASCII<span class="pl-pds">"</span></span>, <span class="pl-v">sub</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>))
+<span class="pl-v">df.texts.clean</span> <span class="pl-k">=</span> 
+ as.data.frame(iconv(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>, <span class="pl-s"><span class="pl-pds">"</span>latin1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ASCII<span class="pl-pds">"</span></span>, <span class="pl-v">sub</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>))
 colnames(<span class="pl-smi">df.texts.clean</span>) <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>FullText<span class="pl-pds">'</span></span>
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">FullText</span> <span class="pl-k">=</span> <span class="pl-smi">df.texts.clean</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>
 rm(<span class="pl-smi">df.texts.clean</span>)
