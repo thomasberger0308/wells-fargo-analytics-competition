@@ -4,40 +4,29 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Wells-fargo-analytics-competition by thomasberger0308</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
   <body>
-
+    <div class="wrapper">
       <header>
         <h1>Wells-fargo-analytics-competition</h1>
         <p></p>
+
+        <p class="view"><a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition">View the Project on GitHub <small>thomasberger0308/wells-fargo-analytics-competition</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition">View On <strong>GitHub</strong></a></li>
+        </ul>
       </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/thomasberger0308/wells-fargo-analytics-competition/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
       <section>
         <p>This page documents the result of the Wells Fargo competition "Use social data to identify drivers of online conversations". At this competition a data-set with 220,377 Twitter and Facebook messages was provided and has been analyzed as seen in the following steps.</p>
 
@@ -133,6 +122,63 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 <p></p>
 
 <h1>
+<a id="word-cloud" class="anchor" href="#word-cloud" aria-hidden="true"><span class="octicon octicon-link"></span></a>Word Cloud</h1>
+
+<h2>
+<a id="source-code" class="anchor" href="#source-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Source Code</h2>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># since it is very slow otherwise, make the dataset smaller</span>
+<span class="pl-v">idx.10000</span> <span class="pl-k">=</span> sample(<span class="pl-c1">1</span><span class="pl-k">:</span>nrow(<span class="pl-smi">df</span>),<span class="pl-c1">10000</span>)
+<span class="pl-v">df.10000</span> <span class="pl-k">=</span> <span class="pl-smi">df</span>[<span class="pl-smi">idx.10000</span>,]
+
+<span class="pl-c"># create a corpus from data frame</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> Corpus(DataframeSource(as.data.frame(<span class="pl-smi">df.10000</span>[,<span class="pl-c1">6</span>]))) 
+
+<span class="pl-c"># Removing punctuation</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">removePunctuation</span>)   
+<span class="pl-c"># Removing numbers</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">removeNumbers</span>) 
+<span class="pl-c">#Converting to lowercase</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">tolower</span>)
+<span class="pl-c">#Removing “stopwords” (common words) that usually have no analytic value.</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">removeWords</span>, stopwords(<span class="pl-s"><span class="pl-pds">"</span>english<span class="pl-pds">"</span></span>))   
+<span class="pl-c">#Removing particular words</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">removeWords</span>, c(<span class="pl-s"><span class="pl-pds">"</span>banka<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>bankb<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>bankc<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>bankd<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>bank<span class="pl-pds">"</span></span>, 
+                                    <span class="pl-s"><span class="pl-pds">"</span>twithndl<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>twithndlbanka<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>twithndlbanka<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>twithndlbankb<span class="pl-pds">"</span></span>,
+                                    <span class="pl-s"><span class="pl-pds">"</span>twithndlbankc<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>twithndlbankd<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>rettwit<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>http<span class="pl-pds">"</span></span>)) 
+<span class="pl-c">#Removing common word endings (e.g., “ing”, “es”, “s”)</span>
+library(<span class="pl-smi">SnowballC</span>)   
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">stemDocument</span>)  
+<span class="pl-c">#Stripping unnecesary whitespace</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">stripWhitespace</span>)
+<span class="pl-c">#Finish</span>
+<span class="pl-smi">docs</span> <span class="pl-k">&lt;-</span> tm_map(<span class="pl-smi">docs</span>, <span class="pl-smi">PlainTextDocument</span>) 
+
+<span class="pl-c">#create a document term matrix</span>
+<span class="pl-smi">dtm</span> <span class="pl-k">&lt;-</span> DocumentTermMatrix(<span class="pl-smi">docs</span>)
+<span class="pl-c">#transpose of this matrix</span>
+<span class="pl-smi">tdm</span> <span class="pl-k">&lt;-</span> TermDocumentMatrix(<span class="pl-smi">docs</span>) 
+
+<span class="pl-c">#  Start by removing sparse terms:   </span>
+<span class="pl-smi">dtms</span> <span class="pl-k">&lt;-</span> removeSparseTerms(<span class="pl-smi">dtm</span>, <span class="pl-c1">0.1</span>)    
+
+<span class="pl-c"># Organize terms by their frequency</span>
+<span class="pl-smi">freq</span> <span class="pl-k">&lt;-</span> colSums(as.matrix(<span class="pl-smi">dtm</span>))  
+<span class="pl-smi">ord</span> <span class="pl-k">&lt;-</span> order(<span class="pl-smi">freq</span>)   
+<span class="pl-c">#  Start by removing sparse terms:   </span>
+<span class="pl-smi">dtms</span> <span class="pl-k">&lt;-</span> removeSparseTerms(<span class="pl-smi">dtm</span>, <span class="pl-c1">0.1</span>) 
+
+<span class="pl-c">#Word Cloud 100 most words</span>
+set.seed(<span class="pl-c1">142</span>)   
+<span class="pl-smi">dark2</span> <span class="pl-k">&lt;-</span> brewer.pal(<span class="pl-c1">6</span>, <span class="pl-s"><span class="pl-pds">"</span>Dark2<span class="pl-pds">"</span></span>)   
+wordcloud(names(<span class="pl-smi">freq</span>), <span class="pl-smi">freq</span>, <span class="pl-v">max.words</span><span class="pl-k">=</span><span class="pl-c1">100</span>, <span class="pl-v">rot.per</span><span class="pl-k">=</span><span class="pl-c1">0.2</span>, <span class="pl-v">colors</span><span class="pl-k">=</span><span class="pl-smi">dark2</span>)   </pre></div>
+
+<h2>
+<a id="result" class="anchor" href="#result" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result</h2>
+
+<p><img src="http://i.imgur.com/B9HMQbG.png" alt=""></p>
+
+<h1>
 <a id="report" class="anchor" href="#report" aria-hidden="true"><span class="octicon octicon-link"></span></a>Report</h1>
 
 <p>There truly is no such thing as perfection especially in the banking world. There is always a complaint, an employee error, a problem with something. In today’s day and age, the use of online banking is growing at a stupendous rate and with the emergence of online banking, there is also online feedback twenty-four-seven. The alarming growth of online banking leads to both outstanding achievements of service and productivity, and unfortunately a long list of dissatisfaction ranging from crashed servers to online problems. Naturally the effects of technological advances are either positive or detrimental to the consumer’s outlook on the bank as a whole. The emotionally connections created between the consumer and the bank can either blossom or fall faster than the leaves in autumn. In terms of the plots shown below, sentiment means emotional reaction towards that bank. There are four banks titled, starting from “Bank A” through “Bank D.” Below are visual representations of data that was sifted out of thousands of twitter comments in regard to each bank: 
@@ -154,11 +200,11 @@ Bank A, as a whole, had the highest sentiment score, meaning that Bank A had the
 <p>With the rise of technology and the use of online banking, the measurement of consumer satisfaction would not be as readily available. Twitter gives the online banking community feedback directly following an incident or situation. This boom of social media has helped the banking community, which is the main piece that online banking is a part of, grow and change their policies, employees, and strategies in the hopes of being as close to a perfect bank as possible.</p>
       </section>
       <footer>
-        <p>Project maintained by <a href="https://github.com/thomasberger0308">thomasberger0308</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+        <p>This project is maintained by <a href="https://github.com/thomasberger0308">thomasberger0308</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    <script src="javascripts/scale.fix.js"></script>
     
   </body>
 </html>
