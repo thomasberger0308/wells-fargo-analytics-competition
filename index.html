@@ -190,6 +190,127 @@ wordcloud(names(<span class="pl-smi">freq</span>), <span class="pl-smi">freq</sp
 <p><img src="http://i.imgur.com/B9HMQbG.png" alt=""></p>
 
 <h1>
+<a id="sentiment" class="anchor" href="#sentiment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sentiment</h1>
+
+<h2>
+<a id="source-code-1" class="anchor" href="#source-code-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Source Code</h2>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># Based on: http://www.ihub.co.ke/blogs/23216</span>
+
+<span class="pl-c"># Only need to do once</span>
+<span class="pl-c"># Download and upload: http://www.cs.uic.edu/~liub/FBS/opinion-lexicon-English.rar</span>
+<span class="pl-c">#system('unrar e opinion-lexicon-English.rar')</span>
+
+<span class="pl-smi">pos</span> <span class="pl-k">&lt;-</span> scan(<span class="pl-s"><span class="pl-pds">'</span>positive-words.txt<span class="pl-pds">'</span></span>,<span class="pl-v">what</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>character<span class="pl-pds">'</span></span>,<span class="pl-v">comment.char</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>;<span class="pl-pds">'</span></span>)
+<span class="pl-smi">neg</span> <span class="pl-k">&lt;-</span> scan(<span class="pl-s"><span class="pl-pds">'</span>negative-words.txt<span class="pl-pds">'</span></span>,<span class="pl-v">what</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>character<span class="pl-pds">'</span></span>,<span class="pl-v">comment.char</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>;<span class="pl-pds">'</span></span>)
+
+<span class="pl-v">score.sentiment</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">sentences</span>, <span class="pl-smi">pos.words</span>, <span class="pl-smi">neg.words</span>, <span class="pl-v">.progress</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>)
+{
+  require(<span class="pl-smi">plyr</span>)
+  require(<span class="pl-smi">stringr</span>)
+
+  <span class="pl-c"># we got a vector of sentences. plyr will handle a list</span>
+  <span class="pl-c"># or a vector as an "l" for us</span>
+  <span class="pl-c"># we want a simple array ("a") of scores back, so we use </span>
+  <span class="pl-c"># "l" + "a" + "ply" = "laply":</span>
+  <span class="pl-v">scores</span> <span class="pl-k">=</span> laply(<span class="pl-smi">sentences</span>, <span class="pl-k">function</span>(<span class="pl-smi">sentence</span>, <span class="pl-smi">pos.words</span>, <span class="pl-smi">neg.words</span>) {
+
+    <span class="pl-c"># clean up sentences with R's regex-driven global substitute, gsub():</span>
+    <span class="pl-v">sentence</span> <span class="pl-k">=</span> gsub(<span class="pl-s"><span class="pl-pds">'</span>[[:punct:]]<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-smi">sentence</span>)
+    <span class="pl-v">sentence</span> <span class="pl-k">=</span> gsub(<span class="pl-s"><span class="pl-pds">'</span>[[:cntrl:]]<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-smi">sentence</span>)
+    <span class="pl-v">sentence</span> <span class="pl-k">=</span> gsub(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\\</span>d+<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-smi">sentence</span>)
+    <span class="pl-c"># and convert to lower case:</span>
+    <span class="pl-v">sentence</span> <span class="pl-k">=</span> tolower(<span class="pl-smi">sentence</span>)
+
+    <span class="pl-c"># split into words. str_split is in the stringr package</span>
+    <span class="pl-v">word.list</span> <span class="pl-k">=</span> str_split(<span class="pl-smi">sentence</span>, <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\\</span>s+<span class="pl-pds">'</span></span>)
+    <span class="pl-c"># sometimes a list() is one level of hierarchy too much</span>
+    <span class="pl-v">words</span> <span class="pl-k">=</span> unlist(<span class="pl-smi">word.list</span>)
+
+    <span class="pl-c"># compare our words to the dictionaries of positive &amp; negative terms</span>
+    <span class="pl-v">pos.matches</span> <span class="pl-k">=</span> match(<span class="pl-smi">words</span>, <span class="pl-smi">pos.words</span>)
+    <span class="pl-v">neg.matches</span> <span class="pl-k">=</span> match(<span class="pl-smi">words</span>, <span class="pl-smi">neg.words</span>)
+
+    <span class="pl-c"># match() returns the position of the matched term or NA</span>
+    <span class="pl-c"># we just want a TRUE/FALSE:</span>
+    <span class="pl-v">pos.matches</span> <span class="pl-k">=</span> <span class="pl-k">!</span>is.na(<span class="pl-smi">pos.matches</span>)
+    <span class="pl-v">neg.matches</span> <span class="pl-k">=</span> <span class="pl-k">!</span>is.na(<span class="pl-smi">neg.matches</span>)
+
+    <span class="pl-c"># and conveniently enough, TRUE/FALSE will be treated as 1/0 by sum():</span>
+    <span class="pl-v">score</span> <span class="pl-k">=</span> sum(<span class="pl-smi">pos.matches</span>) <span class="pl-k">-</span> sum(<span class="pl-smi">neg.matches</span>)
+
+    <span class="pl-k">return</span>(<span class="pl-smi">score</span>)
+  }, <span class="pl-smi">pos.words</span>, <span class="pl-smi">neg.words</span>, <span class="pl-v">.progress</span><span class="pl-k">=</span>.<span class="pl-smi">progress</span> )
+
+  <span class="pl-v">scores.df</span> <span class="pl-k">=</span> <span class="pl-k">data.frame</span>(<span class="pl-v">score</span><span class="pl-k">=</span><span class="pl-smi">scores</span>, <span class="pl-v">text</span><span class="pl-k">=</span><span class="pl-smi">sentences</span>)
+  <span class="pl-k">return</span>(<span class="pl-smi">scores.df</span>)
+}
+
+<span class="pl-v">df.sentiment</span> <span class="pl-k">=</span> <span class="pl-smi">df</span>[]
+
+<span class="pl-v">scores</span> <span class="pl-k">=</span> score.sentiment(<span class="pl-smi">df.sentiment</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>, <span class="pl-smi">pos</span>, <span class="pl-smi">neg</span>, <span class="pl-v">.progress</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>text<span class="pl-pds">'</span></span>)
+<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-v">very.pos</span> <span class="pl-k">=</span> as.numeric(<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-smi">score</span> <span class="pl-k">&gt;</span><span class="pl-k">=</span> <span class="pl-c1">2</span>)
+<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-v">very.neg</span> <span class="pl-k">=</span> as.numeric(<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-smi">score</span> <span class="pl-k">&lt;</span><span class="pl-k">=</span> <span class="pl-k">-</span><span class="pl-c1">2</span>)
+
+<span class="pl-c"># how many very positives and very negatives</span>
+<span class="pl-v">numpos</span> <span class="pl-k">=</span> sum(<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-smi">very.pos</span>)
+<span class="pl-v">numneg</span> <span class="pl-k">=</span> sum(<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-smi">very.neg</span>)
+
+<span class="pl-c"># global score</span>
+<span class="pl-v">global_score</span> <span class="pl-k">=</span> round( <span class="pl-c1">100</span> <span class="pl-k">*</span> <span class="pl-smi">numpos</span> <span class="pl-k">/</span> (<span class="pl-smi">numpos</span> <span class="pl-k">+</span> <span class="pl-smi">numneg</span>) )
+
+<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-v">bankid</span> <span class="pl-k">=</span> <span class="pl-smi">df.sentiment</span><span class="pl-k">$</span><span class="pl-smi">BankID</span>
+
+<span class="pl-c"># colors</span>
+<span class="pl-v">cols</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">"</span>#CC0000<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>#99FF00<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>#FFCC00<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>#3333FF<span class="pl-pds">"</span></span>)
+names(<span class="pl-smi">cols</span>) <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">"</span>BankA<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>BankB<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>BankC<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>BankD<span class="pl-pds">"</span></span>)
+
+<span class="pl-c"># boxplot</span>
+library(<span class="pl-smi">ggplot2</span>)
+<span class="pl-c">#Bank's Sentiment Scores</span>
+ggplot(<span class="pl-smi">scores</span>, aes(<span class="pl-v">x</span><span class="pl-k">=</span><span class="pl-smi">bankid</span>, <span class="pl-v">y</span><span class="pl-k">=</span><span class="pl-smi">score</span>, <span class="pl-v">group</span><span class="pl-k">=</span><span class="pl-smi">bankid</span>)) <span class="pl-k">+</span>
+  geom_boxplot(aes(<span class="pl-v">fill</span><span class="pl-k">=</span><span class="pl-smi">bankid</span>)) <span class="pl-k">+</span>
+  scale_fill_manual(<span class="pl-v">values</span><span class="pl-k">=</span><span class="pl-smi">cols</span>) <span class="pl-k">+</span>
+  geom_jitter(<span class="pl-v">colour</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>gray40<span class="pl-pds">"</span></span>,<span class="pl-v">position</span><span class="pl-k">=</span>position_jitter(<span class="pl-v">width</span><span class="pl-k">=</span><span class="pl-c1">0.2</span>), <span class="pl-v">alpha</span><span class="pl-k">=</span><span class="pl-c1">0.3</span>) <span class="pl-k">+</span>
+  labs(<span class="pl-v">title</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Bank's Sentiment Scores<span class="pl-pds">"</span></span>) <span class="pl-k">+</span> 
+  xlab(<span class="pl-s"><span class="pl-pds">'</span>Bank<span class="pl-pds">'</span></span>) <span class="pl-k">+</span> ylab(<span class="pl-s"><span class="pl-pds">'</span>Sentiment Score<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># barplot of average score</span>
+<span class="pl-v">meanscore</span> <span class="pl-k">=</span> tapply(<span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-smi">score</span>, <span class="pl-smi">scores</span><span class="pl-k">$</span><span class="pl-smi">bankid</span>, <span class="pl-smi">mean</span>)
+<span class="pl-v">df.plot</span> <span class="pl-k">=</span> <span class="pl-k">data.frame</span>(<span class="pl-v">bankid</span><span class="pl-k">=</span>names(<span class="pl-smi">meanscore</span>), <span class="pl-v">meanscore</span><span class="pl-k">=</span><span class="pl-smi">meanscore</span>)
+<span class="pl-smi">df.plot</span><span class="pl-k">$</span><span class="pl-smi">bankids</span> <span class="pl-k">&lt;-</span> reorder(<span class="pl-smi">df.plot</span><span class="pl-k">$</span><span class="pl-smi">bankid</span>, <span class="pl-smi">df.plot</span><span class="pl-k">$</span><span class="pl-smi">meanscore</span>)
+
+ggplot(<span class="pl-smi">df.plot</span>, aes(<span class="pl-v">x</span> <span class="pl-k">=</span> <span class="pl-k">factor</span>(<span class="pl-smi">bankids</span>), <span class="pl-v">y</span> <span class="pl-k">=</span> <span class="pl-smi">meanscore</span>, <span class="pl-v">fill</span><span class="pl-k">=</span><span class="pl-smi">bankids</span>)) <span class="pl-k">+</span>
+  geom_bar(<span class="pl-v">stat</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>identity<span class="pl-pds">"</span></span>) <span class="pl-k">+</span>
+  scale_fill_manual(<span class="pl-v">values</span><span class="pl-k">=</span><span class="pl-smi">cols</span>[order(<span class="pl-smi">df.plot</span><span class="pl-k">$</span><span class="pl-smi">meanscore</span>)]) <span class="pl-k">+</span>
+  labs(<span class="pl-v">title</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Average Sentiment Score<span class="pl-pds">"</span></span>) <span class="pl-k">+</span> 
+  xlab(<span class="pl-s"><span class="pl-pds">'</span>Bank<span class="pl-pds">'</span></span>) <span class="pl-k">+</span> ylab(<span class="pl-s"><span class="pl-pds">'</span>Average Score<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># barplot of average very positive</span>
+<span class="pl-v">bankid_pos</span> <span class="pl-k">=</span> ddply(<span class="pl-smi">scores</span>, .(<span class="pl-smi">bankid</span>), <span class="pl-smi">summarise</span>, <span class="pl-v">mean_pos</span><span class="pl-k">=</span>mean(<span class="pl-smi">very.pos</span>))
+<span class="pl-smi">bankid_pos</span><span class="pl-k">$</span><span class="pl-smi">bankids</span> <span class="pl-k">&lt;-</span> reorder(<span class="pl-smi">bankid_pos</span><span class="pl-k">$</span><span class="pl-smi">bankid</span>, <span class="pl-smi">bankid_pos</span><span class="pl-k">$</span><span class="pl-smi">mean_pos</span>)
+
+ggplot(<span class="pl-smi">bankid_pos</span>, aes(<span class="pl-v">x</span> <span class="pl-k">=</span> <span class="pl-k">factor</span>(<span class="pl-smi">bankid</span>), <span class="pl-v">y</span> <span class="pl-k">=</span> <span class="pl-smi">mean_pos</span>, <span class="pl-v">fill</span><span class="pl-k">=</span><span class="pl-smi">bankid</span>)) <span class="pl-k">+</span>
+  geom_bar(<span class="pl-v">stat</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>identity<span class="pl-pds">"</span></span>) <span class="pl-k">+</span>
+  scale_fill_manual(<span class="pl-v">values</span><span class="pl-k">=</span><span class="pl-smi">cols</span>[order(<span class="pl-smi">df.plot</span><span class="pl-k">$</span><span class="pl-smi">meanscore</span>)]) <span class="pl-k">+</span>
+  labs(<span class="pl-v">title</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Average Very Positive Sentiment Score<span class="pl-pds">"</span></span>) <span class="pl-k">+</span> 
+  xlab(<span class="pl-s"><span class="pl-pds">'</span>Bank<span class="pl-pds">'</span></span>) <span class="pl-k">+</span> ylab(<span class="pl-s"><span class="pl-pds">'</span>Average Score<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># barplot of average very negative</span>
+<span class="pl-v">bankid_neg</span> <span class="pl-k">=</span> ddply(<span class="pl-smi">scores</span>, .(<span class="pl-smi">bankid</span>), <span class="pl-smi">summarise</span>, <span class="pl-v">mean_neg</span><span class="pl-k">=</span>mean(<span class="pl-smi">very.neg</span>))
+<span class="pl-smi">bankid_neg</span><span class="pl-k">$</span><span class="pl-smi">bankids</span> <span class="pl-k">&lt;-</span> reorder(<span class="pl-smi">bankid_neg</span><span class="pl-k">$</span><span class="pl-smi">bankid</span>, <span class="pl-smi">bankid_neg</span><span class="pl-k">$</span><span class="pl-smi">mean_neg</span>)
+
+ggplot(<span class="pl-smi">bankid_neg</span>, aes(<span class="pl-v">x</span> <span class="pl-k">=</span> <span class="pl-k">factor</span>(<span class="pl-smi">bankid</span>), <span class="pl-v">y</span> <span class="pl-k">=</span> <span class="pl-smi">mean_neg</span>, <span class="pl-v">fill</span><span class="pl-k">=</span><span class="pl-smi">bankid</span>)) <span class="pl-k">+</span>
+  geom_bar(<span class="pl-v">stat</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>identity<span class="pl-pds">"</span></span>) <span class="pl-k">+</span>
+  scale_fill_manual(<span class="pl-v">values</span><span class="pl-k">=</span><span class="pl-smi">cols</span>[order(<span class="pl-smi">df.plot</span><span class="pl-k">$</span><span class="pl-smi">meanscore</span>)]) <span class="pl-k">+</span>
+  labs(<span class="pl-v">title</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Average Very Negative Sentiment Score<span class="pl-pds">"</span></span>) <span class="pl-k">+</span> 
+  xlab(<span class="pl-s"><span class="pl-pds">'</span>Bank<span class="pl-pds">'</span></span>) <span class="pl-k">+</span> ylab(<span class="pl-s"><span class="pl-pds">'</span>Average Score<span class="pl-pds">'</span></span>)
+</pre></div>
+
+<h2>
+<a id="results" class="anchor" href="#results" aria-hidden="true"><span class="octicon octicon-link"></span></a>Results</h2>
+
+<h1>
 <a id="report" class="anchor" href="#report" aria-hidden="true"><span class="octicon octicon-link"></span></a>Report</h1>
 
 <p>There truly is no such thing as perfection especially in the banking world. There is always a complaint, an employee error, a problem with something. In today’s day and age, the use of online banking is growing at a stupendous rate and with the emergence of online banking, there is also online feedback twenty-four-seven. The alarming growth of online banking leads to both outstanding achievements of service and productivity, and unfortunately a long list of dissatisfaction ranging from crashed servers to online problems. Naturally the effects of technological advances are either positive or detrimental to the consumer’s outlook on the bank as a whole. The emotionally connections created between the consumer and the bank can either blossom or fall faster than the leaves in autumn. In terms of the plots shown below, sentiment means emotional reaction towards that bank. There are four banks titled, starting from “Bank A” through “Bank D.” Below are visual representations of data that was sifted out of thousands of twitter comments in regard to each bank: 
