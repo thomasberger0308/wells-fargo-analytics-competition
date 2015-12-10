@@ -132,15 +132,28 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 
 <span class="pl-c"># initialize with 'No'</span>
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">Label</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>No<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">atm.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>ATM<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">online2.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Online<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">online1.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Online<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">investment2.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Investment<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">investment1.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Investment<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">fraud.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Fraud<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">service.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Service<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">fee.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Fees<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">job1.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Job<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">job2.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Job<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">job3.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Job<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span> [<span class="pl-smi">job4.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Job<span class="pl-pds">"</span></span>
+
+<span class="pl-c"># make new data frame with the messages where we know the topic</span>
+<span class="pl-smi">df_label</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">df</span>[<span class="pl-k">-</span>which(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">Label</span><span class="pl-k">==</span><span class="pl-s"><span class="pl-pds">'</span>No<span class="pl-pds">'</span></span>), ]
+
 </pre></div>
 
 <h2>
 <a id="rstudio-demo" class="anchor" href="#rstudio-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>RStudio Demo</h2>
 
-<p>In this video the previous steps are shown in a demo.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/81EHUXZZkfE" frameborder="0" allowfullscreen></iframe>
-</p>
+<p>In this video the previous steps are shown in a demo.</p>
 
 <h1>
 <a id="word-cloud" class="anchor" href="#word-cloud" aria-hidden="true"><span class="octicon octicon-link"></span></a>Word Cloud</h1>
