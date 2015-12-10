@@ -48,26 +48,85 @@
 <img src="http://i.imgur.com/Nl1vUOr.png" alt=""></p>
 
 <h1>
-<a id="implementation" class="anchor" href="#implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation</h1>
+<a id="implementation-and-results" class="anchor" href="#implementation-and-results" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation and Results</h1>
 
 <h2>
 <a id="load-data" class="anchor" href="#load-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Load Data</h2>
 
-<div class="highlight highlight-source-r"><pre><span class="pl-c"># Create data frame of dataset</span>
+<div class="highlight highlight-source-r"><pre>library(<span class="pl-smi">tm</span>) 
+library(<span class="pl-smi">rpart</span>)
+
+<span class="pl-c"># Create data frame of dataset</span>
 <span class="pl-v">df</span> <span class="pl-k">=</span> read.table(<span class="pl-s"><span class="pl-pds">'</span>dataset.txt<span class="pl-pds">'</span></span>,<span class="pl-v">sep</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>|<span class="pl-pds">"</span></span>,<span class="pl-v">header</span><span class="pl-k">=</span><span class="pl-c1">T</span>)
 
 <span class="pl-c"># change column 'FullText' to character</span>
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">FullText</span> <span class="pl-k">=</span> as.character(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>)
 
 <span class="pl-c"># Remove non-ascii characters</span>
-<span class="pl-v">df.texts.clean</span> <span class="pl-k">=</span> 
- as.data.frame(iconv(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>, <span class="pl-s"><span class="pl-pds">"</span>latin1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ASCII<span class="pl-pds">"</span></span>, <span class="pl-v">sub</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>))
+<span class="pl-v">df.texts.clean</span> <span class="pl-k">=</span> as.data.frame(iconv(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>, <span class="pl-s"><span class="pl-pds">"</span>latin1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ASCII<span class="pl-pds">"</span></span>, <span class="pl-v">sub</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>))
 colnames(<span class="pl-smi">df.texts.clean</span>) <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>FullText<span class="pl-pds">'</span></span>
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">FullText</span> <span class="pl-k">=</span> <span class="pl-smi">df.texts.clean</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>
 rm(<span class="pl-smi">df.texts.clean</span>)
 
 <span class="pl-c"># change content of column 'Fulltext' to lowercase</span>
-<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">FullText</span> <span class="pl-k">=</span> tolower(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>)
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">FullText</span> <span class="pl-k">=</span> tolower(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>)</pre></div>
+
+<h2>
+<a id="filter-banks" class="anchor" href="#filter-banks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Filter Banks</h2>
+
+<p>Filter Banks</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># Filter banks</span>
+<span class="pl-v">bankA.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>banka<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">bankB.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>bankb<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">bankC.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>bankc<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">bankD.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>bankd<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># Enter new column with bank name</span>
+<span class="pl-c"># initialize with 'No'</span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">BankID</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>No<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">BankID</span>[<span class="pl-smi">bankA.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>BankA<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">BankID</span>[<span class="pl-smi">bankB.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>BankB<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">BankID</span>[<span class="pl-smi">bankC.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>BankC<span class="pl-pds">"</span></span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">BankID</span>[<span class="pl-smi">bankD.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>BankD<span class="pl-pds">"</span></span>
+
+<span class="pl-c"># remove messages where BankA, BankB, BankC or BankD is not mentioned</span>
+<span class="pl-smi">df</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">df</span>[<span class="pl-k">-</span>which(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">BankID</span><span class="pl-k">==</span><span class="pl-s"><span class="pl-pds">'</span>No<span class="pl-pds">'</span></span>), ]</pre></div>
+
+<h2>
+<a id="filter-topics" class="anchor" href="#filter-topics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Filter Topics</h2>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># find messages with the topic 'atm'</span>
+<span class="pl-v">atm.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>atm<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># find messages with the topic 'online'</span>
+<span class="pl-v">online1.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>online<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">online2.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>app<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># find messages with the topic 'investment'</span>
+<span class="pl-v">investment1.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>investor<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">investment2.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>investment<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># find messages with the topic 'fraud'</span>
+<span class="pl-v">fraud.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>fraud<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># find messages with the topic 'service'</span>
+<span class="pl-v">service.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>service<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># find messages with the topic 'fee'</span>
+<span class="pl-v">fee.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>fee<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+<span class="pl-c"># find messages with the topic 'job'</span>
+<span class="pl-v">job1.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>interview<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">job2.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>recruiting<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">job3.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>recruitment<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+<span class="pl-v">job4.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>job<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
+
+
+<span class="pl-c"># Enter new column with topics</span>
+
+<span class="pl-c"># initialize with 'No'</span>
+<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">Label</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>No<span class="pl-pds">"</span></span>
 </pre></div>
 
 <h1>
