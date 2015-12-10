@@ -99,7 +99,7 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 <h2>
 <a id="filter-topics" class="anchor" href="#filter-topics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Filter Topics</h2>
 
-<p>Topics were filtered to analyze the data regarding this topics.</p>
+<p>Topics were filtered to analyze the data regarding these topics.</p>
 
 <div class="highlight highlight-source-r"><pre><span class="pl-c"># find messages with the topic 'atm'</span>
 <span class="pl-v">atm.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>atm<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
@@ -137,12 +137,12 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 <h2>
 <a id="rstudio-demo" class="anchor" href="#rstudio-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>RStudio Demo</h2>
 
-<p>In this video the previous are shown.</p>
+<p>In this video the previous steps are shown in a demo.</p>
 
 <h1>
 <a id="word-cloud" class="anchor" href="#word-cloud" aria-hidden="true"><span class="octicon octicon-link"></span></a>Word Cloud</h1>
 
-<p>To get an overview of the most words a word cloud was generated. </p>
+<p>To get an overview of the most words, a word cloud was generated. </p>
 
 <h2>
 <a id="source-code" class="anchor" href="#source-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Source Code</h2>
@@ -196,8 +196,9 @@ wordcloud(names(<span class="pl-smi">freq</span>), <span class="pl-smi">freq</sp
 <h2>
 <a id="result" class="anchor" href="#result" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result</h2>
 
-<p><img src="http://i.imgur.com/B9HMQbG.png" alt="">
-In this picture it can be clearly seen that "internet" is the most frequent word.</p>
+<p><img src="http://i.imgur.com/B9HMQbG.png" alt=""></p>
+
+<p>In this picture it can be clearly seen that "internet" is the most frequent word.</p>
 
 <h1>
 <a id="sentiment" class="anchor" href="#sentiment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sentiment</h1>
@@ -322,7 +323,8 @@ ggplot(<span class="pl-smi">bankid_neg</span>, aes(<span class="pl-v">x</span> <
 <h2>
 <a id="results" class="anchor" href="#results" aria-hidden="true"><span class="octicon octicon-link"></span></a>Results</h2>
 
-<p><strong>Output for Banks:</strong>
+<p>These are the result of the sentiment analysis.
+<strong>Output for Banks:</strong>
 <img src="http://i.imgur.com/oRIMQG9.png" alt="">
 <img src="http://i.imgur.com/AGgqrSg.png" alt="">
 <img src="http://i.imgur.com/OgGvGN3.png" alt="">
