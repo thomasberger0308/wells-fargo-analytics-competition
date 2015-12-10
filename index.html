@@ -57,6 +57,7 @@
 library(<span class="pl-smi">rpart</span>)
 
 <span class="pl-c"># Create data frame of dataset</span>
+<span class="pl-smi">Here</span> <span class="pl-smi">the</span> <span class="pl-smi">data</span> <span class="pl-smi">were</span> <span class="pl-smi">loaded</span> <span class="pl-smi">and</span> <span class="pl-smi">prepared</span> <span class="pl-k">for</span> <span class="pl-smi">the</span> <span class="pl-k">next</span> <span class="pl-smi">steps</span>.
 <span class="pl-v">df</span> <span class="pl-k">=</span> read.table(<span class="pl-s"><span class="pl-pds">'</span>dataset.txt<span class="pl-pds">'</span></span>,<span class="pl-v">sep</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>|<span class="pl-pds">"</span></span>,<span class="pl-v">header</span><span class="pl-k">=</span><span class="pl-c1">T</span>)
 
 <span class="pl-c"># change column 'FullText' to character</span>
@@ -73,6 +74,8 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 
 <h2>
 <a id="filter-banks" class="anchor" href="#filter-banks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Filter Banks</h2>
+
+<p>Since only messages were BankA, BankB, BankC or BankD are mentioned are relevant, all other messages were deleted. </p>
 
 <div class="highlight highlight-source-r"><pre><span class="pl-c"># Filter banks</span>
 <span class="pl-v">bankA.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>banka<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
@@ -93,6 +96,8 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 
 <h2>
 <a id="filter-topics" class="anchor" href="#filter-topics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Filter Topics</h2>
+
+<p>Topics were filtered to analyze the data regarding this topics.</p>
 
 <div class="highlight highlight-source-r"><pre><span class="pl-c"># find messages with the topic 'atm'</span>
 <span class="pl-v">atm.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>atm<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
@@ -130,8 +135,12 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 <h2>
 <a id="rstudio-demo" class="anchor" href="#rstudio-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>RStudio Demo</h2>
 
+<p>In this video the previous are shown.</p>
+
 <h1>
 <a id="word-cloud" class="anchor" href="#word-cloud" aria-hidden="true"><span class="octicon octicon-link"></span></a>Word Cloud</h1>
+
+<p>To get an overview of the most words a word cloud was generated. </p>
 
 <h2>
 <a id="source-code" class="anchor" href="#source-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Source Code</h2>
@@ -185,10 +194,13 @@ wordcloud(names(<span class="pl-smi">freq</span>), <span class="pl-smi">freq</sp
 <h2>
 <a id="result" class="anchor" href="#result" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result</h2>
 
-<p><img src="http://i.imgur.com/B9HMQbG.png" alt=""></p>
+<p><img src="http://i.imgur.com/B9HMQbG.png" alt="">
+In this picture it can be clearly seen that "internet" is the most frequent word.</p>
 
 <h1>
 <a id="sentiment" class="anchor" href="#sentiment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sentiment</h1>
+
+<p>To analyze if the messages are a positive or negative feedback a sentiment score was calculated.</p>
 
 <h2>
 <a id="code" class="anchor" href="#code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code</h2>
