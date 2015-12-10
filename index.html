@@ -85,7 +85,7 @@ rm(<span class="pl-smi">df.texts.clean</span>)
 <span class="pl-v">bankC.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>bankc<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
 <span class="pl-v">bankD.idx</span> <span class="pl-k">=</span> which(sapply(<span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">FullText</span>,<span class="pl-k">function</span>(<span class="pl-smi">x</span>) grepl(<span class="pl-s"><span class="pl-pds">"</span>bankd<span class="pl-pds">"</span></span>,<span class="pl-smi">x</span>)))
 
-<span class="pl-c"># Enter new column with bank name</span>
+<span class="pl-c"># Create new column with bank name</span>
 <span class="pl-c"># initialize with 'No'</span>
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-v">BankID</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>No<span class="pl-pds">"</span></span>
 <span class="pl-smi">df</span><span class="pl-k">$</span><span class="pl-smi">BankID</span>[<span class="pl-smi">bankA.idx</span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>BankA<span class="pl-pds">"</span></span>
